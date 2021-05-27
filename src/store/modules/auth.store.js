@@ -52,10 +52,7 @@ const actions = {
 	logout: async ({ commit, dispatch }) => {
 		await Api.auth.logout();
 		commit('RESET', initalState())
-		const modules = [
-			'TUTOR', 'SCHEDULES', 'FAVS', 'LESSONS',
-			'PAYMENT', 'SUBSCRIPTIONS', 'TUTORS', 'USERS'
-		]
+		const modules = ['me']
 		modules.forEach(mod => dispatch(`${mod}/resetState`, null, { root: true }))
 		cookies.remove('isAuth', 'accessToken', 'authRole', 'authId')
 		return { error: false }

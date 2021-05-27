@@ -11,7 +11,7 @@
 			v-if="modelValue"
 			aria-hidden="true"
 			@click="!persistent && onClose()"
-			class="fixed inset-0 bg-gray-800 bg-opacity-75 transition-opacity"
+			class="fixed inset-0 bg-black bg-opacity-80 transition-opacity"
 		></div>
 	</transition>
 	<transition

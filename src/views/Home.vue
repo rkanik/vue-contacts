@@ -3,17 +3,41 @@
 		<div class="flex-1">
 			<div class="flex items-center p-4">
 				<h4>Contacts</h4>
+
 				<u-button @click="onInitImport" class="ml-auto">Import</u-button>
+				<u-menu v-model="menu" class="ml-2">
+					<template #toggler="{ on }">
+						<u-button v-on="on">Export</u-button>
+					</template>
+					<div
+						class="bg-white w-max rounded shadow-2xl border-t border-gray-200 mt-1"
+					>
+						<div
+							class="px-6 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+						>
+							Export to CSV
+						</div>
+						<div
+							class="px-6 py-2 hover:bg-gray-100 cursor-pointer text-sm border-t border-gray-100"
+						>
+							Export to VCF
+						</div>
+					</div>
+				</u-menu>
+
 				<u-button @click="$router.push('/new')" class="ml-2"
 					>Add New</u-button
 				>
 			</div>
+			<!-- <u-table></u-table> -->
 			<table class="border border-gray-400 border-collapse px-4 py-2 w-full">
 				<thead class="bg-teal-500 text-white">
 					<tr class="text-left">
-						<th class="border px-4 py-2">
-							<input type="checkbox" v-model="checkedAll" />
-							<span class="ml-2">Select</span>
+						<th class="border px-4 py-2 w-8">
+							<div class="flex">
+								<UCheckbox v-if="checkedAll" v-model="checkedAll" />
+								<span v-else class="ml-2">#</span>
+							</div>
 						</th>
 						<th class="border px-4 py-2">Name</th>
 						<th class="border px-4 py-2">Phone Number</th>
@@ -27,12 +51,8 @@
 						v-for="contact in contacts"
 						class="cursor-pointer"
 					>
-						<td class="border">
-							<input
-								class="ml-4"
-								type="checkbox"
-								v-model="contact.checked"
-							/>
+						<td class="border text-center">
+							<UCheckbox v-model="contact.checked" />
 						</td>
 						<td @click="setContact(contact.id)" class="border px-4 py-2">
 							{{ `${contact.firstName} ${contact.lastName}` }}
@@ -127,8 +147,8 @@ export default {
 		UDialog
 	},
 	data: () => ({
-		checkedAll: false,
-		checked: [],
+		menu: false,
+		contacts: [],
 		trash: {
 			id: '',
 			loading: false,
@@ -140,8 +160,25 @@ export default {
 	},
 	computed: {
 		...mapGetters('me', ['$contact', '$contacts']),
-		contacts() {
-			return this.$contacts.map(c => ({ ...c, checked: false }))
+		checkedAll: {
+			get() { return this.contacts.some(c => c.checked) },
+			set() {
+				const isEvery = this.contacts.every(c => c.checked)
+				this.contacts = this.contacts.map(
+					contact => ({ ...contact, checked: !isEvery })
+				)
+			}
+		}
+	},
+	watch: {
+		$contacts: {
+			deep: true,
+			immediate: true,
+			handler(contacts) {
+				this.contacts = contacts.map(
+					contact => ({ ...contact, checked: false })
+				)
+			}
 		}
 	},
 	methods: {
