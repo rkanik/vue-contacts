@@ -10,8 +10,9 @@ const mutations = {
 		)
 	},
 	DELETE: (state, [array, key, match = 'id']) => {
+		let keys = Array.isArray(key) ? key : [key]
 		state[array] = state[array].filter(
-			el => el[match] !== key
+			el => !keys.includes(el[match])
 		)
 	},
 	UPDATE: (state, [array, data, match = 'id']) => {

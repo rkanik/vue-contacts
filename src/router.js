@@ -10,6 +10,7 @@ import DefaultLayout from './layouts/DefaultLayout.vue'
 
 // Views
 import Home from './views/Home.vue'
+import Trash from './views/Trash.vue'
 import Login from './views/Login.vue'
 import CreateUpdate from './views/CreateUpdate.vue'
 
@@ -34,6 +35,11 @@ const router = createRouter({
 							path: '',
 							name: 'Home',
 							component: Home,
+						},
+						{
+							path: 'trash',
+							name: 'Trash',
+							component: Trash,
 						},
 						{
 							path: '/:id',

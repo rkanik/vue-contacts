@@ -1,27 +1,32 @@
 <template>
-	<label class="checkbox" :class="{ bounce: !path, path }">
-		<input
-			type="checkbox"
-			:value="modelValue"
-			:checked="modelValue"
-			@change="$emit('update:modelValue', !modelValue)"
-		/>
-		<svg viewBox="0 0 21 21">
-			<polyline v-if="!path" points="5 10.75 8.5 14.25 16 6" />
-			<path
-				v-if="path"
-				d="M5,10.75 L8.5,14.25 L19.4,2.3
+	<div class="inline-flex items-center space-x-2">
+		<label class="checkbox" :class="{ bounce: !path, path }">
+			<input
+				type="checkbox"
+				:value="modelValue"
+				:checked="modelValue"
+				@change="onChange"
+			/>
+			<svg viewBox="0 0 21 21">
+				<polyline v-if="!path" points="5 10.75 8.5 14.25 16 6" />
+				<path
+					v-if="path"
+					d="M5,10.75 L8.5,14.25 L19.4,2.3
 			C18.8333333,1.43333333 18.0333333,1 17,1 L4,1 C2.35,1 1,2.35 1,4 L1,17
 			C1,18.65 2.35,20 4,20 L17,20 C18.65,20 20,18.65 20,17 L20,7.99769186"
-			/>
-		</svg>
-	</label>
+				/>
+			</svg>
+		</label>
+		<div v-if="label" class="cursor-pointer text-sm" @click="onChange">
+			{{ label }}
+		</div>
+	</div>
 </template>
 
 <script>
 export default {
 	name: 'UCheckbox',
-	emits: ['update:modelValue'],
+	emits: ['update:modelValue', 'change'],
 	props: {
 		path: Boolean,
 		label: String,
@@ -30,6 +35,13 @@ export default {
 			type: Boolean,
 		}
 	},
+	methods: {
+		onChange() {
+			let newValue = !this.modelValue
+			this.$emit('update:modelValue', newValue)
+			this.$emit('change', newValue)
+		}
+	}
 }
 </script>
 <style scoped lang='scss'>

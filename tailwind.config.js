@@ -10,11 +10,11 @@ module.exports = {
 		extend: {},
 		colors: {
 			transparent: 'transparent',
-      current: 'currentColor',
-      black: colors.black,
-      white: colors.white,
-      gray: colors.trueGray,
-      red: colors.rose,
+			current: 'currentColor',
+			black: colors.black,
+			white: colors.white,
+			gray: colors.trueGray,
+			red: colors.rose,
 			teal: colors.teal,
 		}
 	},

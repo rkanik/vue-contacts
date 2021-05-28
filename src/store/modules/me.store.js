@@ -4,7 +4,8 @@ import { handle, createMutations } from '../helpers'
 
 const initalState = () => ({
 	contactId: null,
-	contacts: []
+	contacts: [],
+	trashed: []
 })
 
 const state = initalState()
@@ -12,6 +13,7 @@ const mutations = createMutations('SET', 'PUSH', 'MERGE', 'UPDATE', 'DELETE', 'R
 
 const getters = {
 	$contacts: state => state.contacts,
+	$trashed: state => state.trashed,
 	$contact: state => state.contacts.find(
 		contact => contact.id === state.contactId
 	),
@@ -23,10 +25,40 @@ const actions = {
 			commit('SET', { contacts: res.contacts.data })
 		}
 	),
-	importContacts: ({ commit }, { data, queries }) => {
+	fetchTrashedContacts: ({ commit }, payload) => handle(
+		Api.Me.Contacts.fetchTrashed, payload, res => {
+			commit('SET', { trashed: res.contacts.data })
+		}
+	),
+	importContacts: ({ commit }, data) => {
 		return handle(
-			Api.Me.Contacts.import, toFormData(data), queries, res => {
+			Api.Me.Contacts.import, toFormData(data), res => {
 				commit('SET', { contacts: res.contacts.data })
+			}
+		)
+	},
+	moveContactsToTrash: ({ commit, dispatch }, payload) => {
+		return handle(
+			Api.Me.Contacts.trash, payload, async (res) => {
+				console.log('moveContactsToTrash', res)
+				await dispatch('fetchTrashedContacts')
+				commit('DELETE', ['contacts', payload])
+			}
+		)
+	},
+	restoreContactsFromTrash: ({ commit, dispatch }, payload) => {
+		return handle(
+			Api.Me.Contacts.restore, payload, async (res) => {
+				console.log('restoreContactsFromTrash', res)
+				await dispatch('fetchContacts')
+				commit('DELETE', ['trashed', payload])
+			}
+		)
+	},
+	deleteContacts: ({ commit }, payload) => {
+		return handle(
+			Api.Me.Contacts.delete, payload, async () => {
+				commit('DELETE', ['trashed', payload])
 			}
 		)
 	},
@@ -43,11 +75,6 @@ const actions = {
 	updateContact: ({ commit }, payload) => handle(
 		Api.Me.Contacts.update, payload, res => {
 			commit('UPDATE', ['contacts', res.contact])
-		}
-	),
-	deleteContact: ({ commit }, payload) => handle(
-		Api.Me.Contacts.delete, payload, () => {
-			commit('DELETE', ['contacts', payload])
 		}
 	),
 	setContact: ({ commit, state: { contactId } }, payload) => {

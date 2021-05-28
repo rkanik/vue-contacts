@@ -5,6 +5,12 @@
 				<h4>Contacts</h4>
 
 				<u-button @click="onInitImport" class="ml-auto">Import</u-button>
+				<u-button
+					class="ml-2"
+					v-if="checked > 0"
+					@click="trashAll.dialog = true"
+					>Delete</u-button
+				>
 				<u-menu v-model="menu" class="ml-2">
 					<template #toggler="{ on }">
 						<u-button v-on="on">Export</u-button>
@@ -29,19 +35,58 @@
 					>Add New</u-button
 				>
 			</div>
-			<!-- <u-table></u-table> -->
+
 			<table class="border border-gray-400 border-collapse px-4 py-2 w-full">
 				<thead class="bg-teal-500 text-white">
 					<tr class="text-left">
-						<th class="border px-4 py-2 w-8">
+						<th class="border px-4 py-2 w-10">
 							<div class="flex">
-								<UCheckbox v-if="checkedAll" v-model="checkedAll" />
+								<u-menu v-model="menus.checkAll" v-if="checked > 0">
+									<template #toggler="{ on }">
+										<div
+											v-on="on"
+											class="w-5 h-5 cursor-pointer border-2 rounded border-gray-900 bg-gray-900 flex items-center justify-center"
+										>
+											<div
+												v-if="checked < contacts.length"
+												class="h-0.5 w-3 bg-white rounded-full"
+											></div>
+											<svg
+												v-else
+												class="transform text-white scale-125 -translate-x-px"
+												viewBox="0 0 21 21"
+											>
+												<polyline
+													class="stroke-2 stroke-current"
+													points="5 10.75 8.5 14.25 16 6"
+												/>
+											</svg>
+										</div>
+									</template>
+									<div
+										class="text-gray-900 bg-white w-max rounded shadow-2xl border border-gray-200 mt-1"
+									>
+										<div
+											@click="onSelectAllContacts"
+											class="px-4 py-1 hover:bg-gray-100 cursor-pointer text-sm"
+										>
+											All
+										</div>
+										<div
+											@click="onSeselectAllContacts"
+											class="px-4 py-1 hover:bg-gray-100 cursor-pointer text-sm border-t border-gray-200"
+										>
+											None
+										</div>
+									</div>
+								</u-menu>
 								<span v-else class="ml-2">#</span>
 							</div>
 						</th>
 						<th class="border px-4 py-2">Name</th>
 						<th class="border px-4 py-2">Phone Number</th>
 						<th class="border px-4 py-2">Email</th>
+						<th class="border px-4 py-2">Job Title & Company</th>
 						<th class="border px-4 py-2">Actions</th>
 					</tr>
 				</thead>
@@ -71,6 +116,12 @@
 							<span v-if="contact.emails && contact.emails.length > 0">
 								{{ contact.emails[0].email }}</span
 							>
+						</td>
+						<td class="border px-4 py-2">
+							<span v-if="contact.jobTitle">{{
+								contact.jobTitle + ", "
+							}}</span>
+							{{ contact.company }}
 						</td>
 						<td class="border px-4 py-2">
 							<button @click="onInitTrash(contact.id)">Delete</button>
@@ -122,25 +173,29 @@
 				</div>
 			</div>
 		</div>
-		<UDialog persistent v-model="trash.dialog">
-			<div class="p-5">
-				<h1 class="font-semibold text-lg">Are you sure to delete</h1>
-				<p class="text-gray-500">
-					Once you delete this action can't be undone
-				</p>
-				<div class="mt-4 flex justify-end space-x-2">
-					<u-button text @click="trash.dialog = false">No</u-button>
-					<u-button @click="onConfirmTrash">Yes</u-button>
-				</div>
-			</div>
-		</UDialog>
+		<u-dialog persistent v-model="trash.dialog">
+			<u-confirm
+				title="Are you sure to delete?"
+				subtitle="Once you delete this action can't be undone"
+				@no="trash.dialog = false"
+				@yes="onConfirmTrash"
+			/>
+		</u-dialog>
+		<u-dialog persistent v-model="trashAll.dialog">
+			<u-confirm
+				title="Are you sure to delete?"
+				subtitle="Once you delete this action can't be undone"
+				@no="trashAll.dialog = false"
+				@yes="onConfirmTrashAll"
+			/>
+		</u-dialog>
 	</div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import UConfirm from '../components/dialogs/UConfirm.vue'
 import UDialog from '../components/utils/UDialog.vue'
-import { v } from '../helpers'
 export default {
 	name: 'Home',
 	components: {
@@ -148,9 +203,17 @@ export default {
 	},
 	data: () => ({
 		menu: false,
+		components: { UConfirm },
+		menus: {
+			checkAll: false
+		},
 		contacts: [],
 		trash: {
 			id: '',
+			loading: false,
+			dialog: false
+		},
+		trashAll: {
 			loading: false,
 			dialog: false
 		}
@@ -159,15 +222,15 @@ export default {
 		await this.fetchContacts()
 	},
 	computed: {
-		...mapGetters('me', ['$contact', '$contacts']),
-		checkedAll: {
-			get() { return this.contacts.some(c => c.checked) },
-			set() {
-				const isEvery = this.contacts.every(c => c.checked)
-				this.contacts = this.contacts.map(
-					contact => ({ ...contact, checked: !isEvery })
-				)
-			}
+		...mapGetters('me', [
+			'$contact',
+			'$contacts'
+		]),
+		checked() {
+			return this.contacts.reduce(
+				(count, contact) => count + contact.checked
+				, 0
+			)
 		}
 	},
 	watch: {
@@ -183,19 +246,28 @@ export default {
 	},
 	methods: {
 		...mapActions('me', [
-			'setContact',
 			'fetchContacts',
-			'deleteContact',
-			'importContacts'
+			'fetchTrashedContacts',
+
+			'setContact',
+			'importContacts',
+
+			'moveContactsToTrash'
 		]),
+
+		mapContacts(payload) {
+			this.contacts = this.contacts.map(
+				contact => ({ ...contact, ...payload })
+			)
+		},
+		onSeselectAllContacts() {
+			this.mapContacts({ checked: false })
+		},
+		onSelectAllContacts() {
+			this.mapContacts({ checked: true })
+		},
 		async onChangeFile(event) {
-			console.log('onChangeFile', event.target.files[0], v(event.target.files[0]).isObject())
-			const file = event.target.files[0]
-			let res = await this.importContacts({
-				data: { file },
-				queries: { type: file.name.split('.').pop() }
-			})
-			console.log(res)
+			await this.importContacts({ file: event.target.files[0] })
 		},
 		onInitImport() {
 			const input = document.createElement('input')
@@ -212,11 +284,19 @@ export default {
 		},
 		async onConfirmTrash() {
 			console.log('onConfirmTrash')
-			let res = await this.deleteContact(this.trash.id)
+			let res = await this.moveContactsToTrash([this.trash.id])
 			if (res.error) return console.log(res)
-
 			this.trash = { ...this.trash, id: null, dialog: false }
-		}
+		},
+		async onConfirmTrashAll() {
+			let res = await this.moveContactsToTrash(
+				this.contacts
+					.filter(c => c.checked)
+					.map(c => c.id)
+			)
+			if (res.error) return
+			this.trashAll.dialog = false
+		},
 	}
 }
 </script>

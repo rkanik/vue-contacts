@@ -44,6 +44,7 @@ export default {
 	methods: {
 		onClose() {
 			this.$emit('update:modelValue', false)
+			this.$emit('close', false)
 		}
 	},
 };

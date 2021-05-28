@@ -13,7 +13,8 @@
 		>
 			<div
 				v-if="modelValue"
-				class="absolute min-w-full transform transition-all"
+				@click="closeOnContentClick && $emit('update:modelValue', false)"
+				class="absolute min-w-full transform transition-all z-10"
 			>
 				<slot />
 			</div>
@@ -26,6 +27,10 @@ export default {
 	name: 'UMenu',
 	emits: ['update:modelValue'],
 	props: {
+		closeOnContentClick: {
+			type: Boolean,
+			default: true
+		},
 		modelValue: {
 			type: Boolean,
 			required: true

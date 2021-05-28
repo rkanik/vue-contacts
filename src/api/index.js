@@ -30,11 +30,16 @@ const Api = {
 		// CONTACTS
 		Contacts: {
 			fetchAll: queries => h(GET, "/me/contacts", queries),
-			fetch: id => h(GET, "/me/contacts/" + id),
+			fetchTrashed: queries => h(GET, "/me/contacts/trashed", queries),
 			save: data => h(POST, "/me/contacts/", data),
+
+			fetch: id => h(GET, "/me/contacts/" + id),
 			update: data => h(PUT, "/me/contacts/" + data.id, data),
-			delete: id => h(DELETE, "/me/contacts/", id),
-			import: (data, queries) => h(POST, "/me/contacts/import", data, queries),
+
+			import: data => h(POST, "/me/contacts/import", data),
+			trash: ids => h(POST, "/me/contacts/trash", { ids }),
+			restore: ids => h(POST, "/me/contacts/restore", { ids }),
+			delete: ids => h(POST, "/me/contacts/delete", { ids }),
 		}
 	}
 }
