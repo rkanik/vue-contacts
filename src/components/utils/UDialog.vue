@@ -11,7 +11,7 @@
 			v-if="modelValue"
 			aria-hidden="true"
 			@click="!persistent && onClose()"
-			class="fixed inset-0 bg-black bg-opacity-80 transition-opacity"
+			class="fixed inset-0 z-40 bg-black bg-opacity-80 transition-opacity"
 		></div>
 	</transition>
 	<transition
@@ -24,7 +24,8 @@
 	>
 		<div
 			v-if="modelValue"
-			class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+			class="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full"
+			
 		>
 			<slot />
 		</div>
@@ -34,6 +35,7 @@
 <script>
 export default {
 	name: 'UDialog',
+	emits: ['close', 'update:modelValue'],
 	props: {
 		persistent: Boolean,
 		modelValue: {

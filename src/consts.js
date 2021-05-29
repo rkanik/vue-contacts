@@ -13,7 +13,6 @@ export const _roles = {
 	Admin: 'admin'
 }
 
-
 export const _time = (() => {
 	let sec = 1000
 	let min = sec * 60

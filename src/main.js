@@ -7,7 +7,9 @@ import router from './router'
 
 // Stylesheets
 import './assets/css/tailwind.css'
+import './assets/scss/main.scss'
 import { cookies } from './helpers'
+import { _serverBase } from './consts'
 
 const app = createApp(App)
 
@@ -23,6 +25,10 @@ store.commit('auth/SET', {
 		id: authId,
 		role: authRole
 	}
+})
+
+app.provide('toAvatar', (url) => {
+	return url ? _serverBase + '/storage/' + url : null
 })
 
 app.use(router)

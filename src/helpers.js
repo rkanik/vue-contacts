@@ -2,6 +2,14 @@ import moment from "moment"
 import Cookies from "js-cookie"
 import { _time } from "./consts"
 
+export const createElement = (tag, attrs) => {
+	let el = document.createElement(tag)
+	Object
+		.entries(attrs)
+		.forEach(([attr, value]) => (el[attr] = value))
+	return el
+}
+
 function isPlainObject(input) {
 	return Object.prototype.toString.call(input) === '[object Object]'
 }
@@ -37,7 +45,7 @@ export const has = (obj, key) => {
 export const generatePassword = (len = 8) => {
 	let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	let password = "";
-	for (var i = 0, n = chars.length; i < len; ++i) {
+	for (let i = 0, n = chars.length; i < len; ++i) {
 		password += chars.charAt(Math.floor(Math.random() * n));
 	}
 	return password;
@@ -45,6 +53,18 @@ export const generatePassword = (len = 8) => {
 
 export const isInt = n => Number(n) === n && n % 1 === 0
 export const isFloat = n => Number(n) === n && n % 1 !== 0
+
+export const toFile = (dataURL, filename = 'file') => {
+	let arr = dataURL.split(','),
+		mime = arr[0].match(/:(.*?);/)[1],
+		bstr = atob(arr[1]),
+		n = bstr.length,
+		u8arr = new Uint8Array(n);
+	while (n--) {
+		u8arr[n] = bstr.charCodeAt(n);
+	}
+	return new File([u8arr], filename, { type: mime });
+}
 
 export const toImageBase64 = (files, callback) => {
 	const readFile = (file) => {

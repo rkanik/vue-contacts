@@ -4,17 +4,18 @@
 			<button @click="onClickToggler">Click Me</button>
 		</slot>
 		<transition
-			enter-from-class="opacity-0 translate-y-1"
+			enter-from-class="transform opacity-0 translate-y-1"
 			enter-active-class="ease-out duration-300"
-			enter-to-class="opacity-100 translate-y-0"
-			leave-from-class="opacity-100 translate-y-0"
+			enter-to-class="transform opacity-100 translate-y-0"
+			leave-from-class="transform opacity-100 translate-y-0"
 			leave-active-class="ease-in duration-200"
-			leave-to-class="opacity-0 translate-y-1"
+			leave-to-class="transform opacity-0 translate-y-1"
 		>
 			<div
 				v-if="modelValue"
+				:class="contentClass"
 				@click="closeOnContentClick && $emit('update:modelValue', false)"
-				class="absolute min-w-full transform transition-all z-10"
+				class="absolute min-w-full transition-all z-10"
 			>
 				<slot />
 			</div>
@@ -27,6 +28,7 @@ export default {
 	name: 'UMenu',
 	emits: ['update:modelValue'],
 	props: {
+		contentClass: String,
 		closeOnContentClick: {
 			type: Boolean,
 			default: true

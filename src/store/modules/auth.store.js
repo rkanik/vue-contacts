@@ -1,7 +1,7 @@
 
 import Api from '../../api'
 import { _roles } from '../../consts'
-import { cookies, diff, isEmpty } from '../../helpers'
+import { cookies, diff, toFormData } from '../../helpers'
 import { createMutations, handle } from '../helpers'
 
 const initalState = () => ({
@@ -24,12 +24,17 @@ const getters = {
 
 const actions = {
 	async fetchProfile({ commit, }) {
-		let res = await Api.auth.getProfile()
+		let res = await Api.Me.profile()
 		if (res.success) commit('SET', {
 			user: { ...res.user }
 		})
 		return res
 	},
+	updateAvatar: ({ commit }, payload) => handle(
+		Api.Me.updateAvatar, toFormData(payload), ({ user }) => {
+			commit('SET', { user })
+		}
+	),
 	login: async ({ commit }, payload) => {
 		let res = await Api.auth.login(payload)
 		if (res.success) {

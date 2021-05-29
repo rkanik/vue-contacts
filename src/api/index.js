@@ -18,14 +18,13 @@ const Api = {
 		resetPassword: data => h(POST, "/password/reset", data),
 		checkToken: query => h(GET, "/password/check", query),
 
-		// PROFILE
-		getProfile: () => h(GET, "/me"),
-		uploadAvatar: data => h(POST, "/update/user-profile", data, true)
 	},
 
 	// Me
 	Me: {
+		// PROFILE
 		profile: () => h(GET, "/me"),
+		updateAvatar: data => h(POST, "/me/avatar", data),
 
 		// CONTACTS
 		Contacts: {
