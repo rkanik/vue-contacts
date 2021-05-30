@@ -3,7 +3,8 @@ import { createMutations } from "./helpers"
 
 const initialState = () => ({
 	drawer: true,
-	loading: false
+	loading: false,
+	dark: false
 })
 
 export const state = initialState()
@@ -11,7 +12,8 @@ export const mutations = createMutations('SET')
 
 export const getters = {
 	$drawer: ({ drawer }) => drawer,
-	$loading: ({ loading }) => loading
+	$loading: ({ loading }) => loading,
+	$dark: s => s.dark
 }
 
 export const actions = {
@@ -28,5 +30,10 @@ export const actions = {
 				? !loading
 				: payload
 		})
+	},
+	switchTheme({ commit, state: { dark } }, payload) {
+		const isDark = isEmpty(payload) ? !dark : payload
+		document.documentElement.classList.toggle('dark', isDark)
+		commit('SET', { dark: isDark })
 	},
 }

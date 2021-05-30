@@ -84,11 +84,11 @@ export default {
 		}
 		50% {
 			stroke-dasharray: 120, 300;
-			stroke-dashoffset: -$d / 3;
+			stroke-dashoffset: -58.54832458496093;
 		}
 		100% {
 			stroke-dasharray: 120, 300;
-			stroke-dashoffset: -$d;
+			stroke-dashoffset: -175.6449737548828;
 		}
 	}
 	@keyframes contanim {

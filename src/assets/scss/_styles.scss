@@ -1,0 +1,24 @@
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color: #212121;
+}
+body {
+	color: #616161;
+}
+.dark {
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		color: #fafafa;
+	}
+	body {
+		color: #e0e0e0;
+	}
+}

@@ -1,5 +1,5 @@
 <template>
-	<i :class="{ [`mdi mdi-${mdi}`]: mdi }" />
+	<i :class="{ [`mdi ${mdi.startsWith('mdi') ? mdi : 'mdi-' + mdi}`]: mdi }" />
 </template>
 
 <script>

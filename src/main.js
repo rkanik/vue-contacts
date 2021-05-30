@@ -15,18 +15,17 @@ const app = createApp(App)
 
 registerGlobalComponents(app)
 
-const {
-	isAuth, accessToken,
-	authRole, authId
-} = cookies.get('isAuth', 'accessToken', 'authRole', 'authId')
+const c = cookies.get('isAuth', 'accessToken', 'authRole', 'authId')
 store.commit('auth/SET', {
-	isAuth, accessToken,
+	isAuth: c.isAuth,
+	accessToken: c.accessToken,
 	user: {
-		id: authId,
-		role: authRole
+		id: c.authId,
+		role: c.authRole
 	}
 })
 
+document.documentElement.classList.toggle('dark', store.state.dark)
 app.provide('toAvatar', (url) => {
 	return url ? _serverBase + '/storage/' + url : null
 })

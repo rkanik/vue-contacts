@@ -6,7 +6,7 @@ module.exports = {
 		'./src/**/*.{vue,js,ts,jsx,tsx}'
 	],
 	presets: [],
-	darkMode: false, // or 'media' or 'class'
+	darkMode: 'class',
 	theme: {
 		screens: {
 			sm: '640px',
@@ -16,7 +16,22 @@ module.exports = {
 			'2xl': '1536px',
 		},
 		colors: {
-			primary: colors.teal,
+
+			'primary': '#f5feff',
+			'seondary': '#ffffff',
+			'accent': '#048998',
+			'text-primary': '#212121',
+			'text-secondary': '#616161',
+			'divider': '#424242',
+
+			'dark-primary': '#303841',
+			'dark-seondary': '#3a4750',
+			'dark-accent': '#00adb5',
+			'dark-text-primary': '#fafafa',
+			'dark-text-secondary': '#e0e0e0',
+			'dark-divider': '#211a5f',
+
+			// primary: colors.teal,
 
 			transparent: 'transparent',
 			current: 'currentColor',
