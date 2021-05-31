@@ -7,9 +7,16 @@
 		<img
 			:alt="alt"
 			:src="src || avatar"
+			v-if="src || (!src && !text)"
 			:class="{ 'rounded-full': circle }"
 			class="h-full w-full object-cover object-center"
 		/>
+		<div
+			v-else-if="text"
+			class="uppercase text-xs font-medium tracking-wider rounded-full bg-dark-seondary h-full w-full flex items-center justify-center"
+		>
+			{{ text }}
+		</div>
 		<slot />
 	</div>
 </template>
@@ -21,6 +28,7 @@ export default {
 	props: {
 		src: String,
 		alt: String,
+		text: [String, null],
 		circle: {
 			type: Boolean,
 			default: true

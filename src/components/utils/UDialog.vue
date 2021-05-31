@@ -24,8 +24,7 @@
 	>
 		<div
 			v-if="modelValue"
-			class="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full"
-			
+			class="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full bg-seondary dark:bg-dark-seondary"
 		>
 			<slot />
 		</div>

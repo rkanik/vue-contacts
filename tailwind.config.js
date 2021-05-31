@@ -29,7 +29,7 @@ module.exports = {
 			'dark-accent': '#00adb5',
 			'dark-text-primary': '#fafafa',
 			'dark-text-secondary': '#e0e0e0',
-			'dark-divider': '#211a5f',
+			'dark-divider': '#465e6e',
 
 			// primary: colors.teal,
 
