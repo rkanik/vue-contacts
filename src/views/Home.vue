@@ -28,7 +28,7 @@
 				<div
 					class="h-12 uppercase flex items-center text-sm text-seondary dark:text-dark-text-secondary tracking-widest"
 				>
-					Contacts (354)
+					Contacts ({{ $contacts.total }})
 				</div>
 
 				<u-menu v-model="menus.checkAll" v-if="checked > 0">
@@ -303,7 +303,7 @@ export default {
 		}
 	},
 	watch: {
-		$contacts: {
+		'$contacts.data': {
 			deep: true,
 			immediate: true,
 			handler(contacts) {

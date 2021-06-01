@@ -1,10 +1,12 @@
 import Api from '../../api'
-import { toFormData } from '../../helpers'
-import { handle, createMutations } from '../helpers'
+import { only, toFormData } from '../../helpers'
+import { handle, createMutations, initialList } from '../helpers'
 
 const initalState = () => ({
 	contactId: null,
-	contacts: [],
+
+	// Arrays
+	contacts: initialList(),
 	trashed: []
 })
 
@@ -14,7 +16,7 @@ const mutations = createMutations('SET', 'PUSH', 'MERGE', 'UPDATE', 'DELETE', 'R
 const getters = {
 	$contacts: state => state.contacts,
 	$trashed: state => state.trashed,
-	$contact: state => state.contacts.find(
+	$contact: state => state.contacts.data.find(
 		contact => contact.id === state.contactId
 	),
 }
@@ -22,7 +24,13 @@ const getters = {
 const actions = {
 	fetchContacts: ({ commit }, payload) => handle(
 		Api.Me.Contacts.fetchAll, payload, res => {
-			commit('SET', { contacts: res.contacts.data })
+			commit('SET', {
+				contacts: only(
+					res.contacts, [
+					'data', 'currentPage',
+					'total', 'perPage'
+				])
+			})
 		}
 	),
 	fetchTrashedContacts: ({ commit }, payload) => handle(

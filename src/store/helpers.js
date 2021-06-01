@@ -1,5 +1,12 @@
 import { isObject } from "../helpers"
 
+export const initialList = () => ({
+	total: 0,
+	perPage: 50,
+	currentPage: 1,
+	data: []
+})
+
 const mutations = {
 	PUSH: (state, [array, item]) => (state[array].push(item)),
 	UNSHIFT: (state, [array, item]) => (state[array].unshift(item)),

@@ -2,6 +2,27 @@ import moment from "moment"
 import Cookies from "js-cookie"
 import { _time } from "./consts"
 
+/**
+ * 
+ * @param {object} object 
+ * @param {*} keys 
+ * @returns {objecr}
+ */
+export const only = (object, keys) => {
+	return keys.reduce((data, key) => {
+		if (!key) return data
+		const splitted = key.split('.')
+		if (has(object, key)) data[key] = object[key]
+		else if (splitted.length > 1 && has(object, splitted[0])) {
+			data[splitted[0]] = only(
+				object[splitted[0]],
+				splitted.slice(1).join('.').split(',')
+			)
+		}
+		return data
+	}, {})
+}
+
 export const createElement = (tag, attrs) => {
 	let el = document.createElement(tag)
 	Object
