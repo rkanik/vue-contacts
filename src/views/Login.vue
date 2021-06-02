@@ -78,17 +78,11 @@ export default {
 	methods: {
 		...mapActions('auth', ['login', 'logout']),
 		async onSubmitSignIn() {
-
-			console.log(this.$store)
-
-			// if (!this.$refs.signinForm.validate()) return
 			this.loading = true
-
 			let res = await this.login(this.credential)
 			if (res.error && res.statusCode === 401) this.error = res.statusText || res.message
 			else if (res.error) this.error = res.message || 'Error while singinig in, Please try again later.'
 			else this.$router.replace('/')
-
 			this.loading = false
 		},
 	}

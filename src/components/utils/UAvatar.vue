@@ -13,7 +13,8 @@
 		/>
 		<div
 			v-else-if="text"
-			class="uppercase text-xs font-medium tracking-wider rounded-full bg-dark-seondary h-full w-full flex items-center justify-center"
+			:class="textClass"
+			class="uppercase font-medium tracking-wider rounded-full bg-dark-seondary h-full w-full flex items-center justify-center"
 		>
 			{{ text }}
 		</div>
@@ -29,6 +30,10 @@ export default {
 		src: String,
 		alt: String,
 		text: [String, null],
+		textClass: {
+			type: String,
+			default: 'text-xs'
+		},
 		circle: {
 			type: Boolean,
 			default: true

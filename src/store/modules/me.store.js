@@ -7,6 +7,7 @@ const initalState = () => ({
 
 	// Arrays
 	contacts: initialList(),
+	favoriteContacts: initialList(),
 	trashed: []
 })
 
@@ -15,24 +16,54 @@ const mutations = createMutations('SET', 'PUSH', 'MERGE', 'UPDATE', 'DELETE', 'R
 
 const getters = {
 	$contacts: state => state.contacts,
+	$favoriteContacts: state => state.favoriteContacts,
 	$trashed: state => state.trashed,
-	$contact: state => state.contacts.data.find(
-		contact => contact.id === state.contactId
-	),
+	$contact: state => {
+		return state.contacts.data
+			.concat(state.favoriteContacts.data)
+			.find(contact => contact.id === state.contactId)
+	},
 }
 
 const actions = {
-	fetchContacts: ({ commit }, payload) => handle(
-		Api.Me.Contacts.fetchAll, payload, res => {
-			commit('SET', {
-				contacts: only(
-					res.contacts, [
-					'data', 'currentPage',
-					'total', 'perPage'
-				])
-			})
+	fetchContacts: ({ commit }, payload = {}) => {
+		payload = {
+			where: {
+				isFavorite: 0
+			},
+			...payload
 		}
-	),
+		return handle(
+			Api.Me.Contacts.fetchAll, payload, res => {
+				commit('SET', {
+					contacts: only(
+						res.contacts, [
+						'data', 'currentPage',
+						'total', 'perPage'
+					])
+				})
+			}
+		)
+	},
+	fetchFavoriteContacts: ({ commit }, payload = {}) => {
+		payload = {
+			where: {
+				isFavorite: 1
+			},
+			...payload
+		}
+		return handle(
+			Api.Me.Contacts.fetchAll, payload, res => {
+				commit('SET', {
+					favoriteContacts: only(
+						res.contacts, [
+						'data', 'currentPage',
+						'total', 'perPage'
+					])
+				})
+			}
+		)
+	},
 	fetchTrashedContacts: ({ commit }, payload) => handle(
 		Api.Me.Contacts.fetchTrashed, payload, res => {
 			commit('SET', { trashed: res.contacts.data })
@@ -48,7 +79,6 @@ const actions = {
 	moveContactsToTrash: ({ commit, dispatch }, payload) => {
 		return handle(
 			Api.Me.Contacts.trash, payload, async (res) => {
-				console.log('moveContactsToTrash', res)
 				await dispatch('fetchTrashedContacts')
 				commit('DELETE', ['contacts', payload])
 			}
@@ -57,7 +87,6 @@ const actions = {
 	restoreContactsFromTrash: ({ commit, dispatch }, payload) => {
 		return handle(
 			Api.Me.Contacts.restore, payload, async (res) => {
-				console.log('restoreContactsFromTrash', res)
 				await dispatch('fetchContacts')
 				commit('DELETE', ['trashed', payload])
 			}
@@ -71,7 +100,7 @@ const actions = {
 		)
 	},
 	fetchContact: ({ commit, state: { contacts } }, payload) => {
-		const contact = contacts.find(c => c.id === payload)
+		const contact = contacts.data.find(c => c.id === payload)
 		if (contact) {
 			commit('SET', { contactId: payload })
 			return contact
@@ -82,7 +111,13 @@ const actions = {
 	},
 	updateContact: ({ commit }, payload) => handle(
 		Api.Me.Contacts.update, payload, res => {
-			commit('UPDATE', ['contacts', res.contact])
+			commit('UPDATE', ['contacts.data', res.contact])
+		}
+	),
+	toggleFavorite: ({ commit }, payload) => handle(
+		Api.Me.Contacts.update, payload, res => {
+			commit('PUSH', [payload.isFavorite ? 'favoriteContacts.data' : 'contacts.data', res.contact])
+			commit('DELETE', [payload.isFavorite ? 'contacts.data' : 'favoriteContacts.data', payload.id])
 		}
 	),
 	setContact: ({ commit, state: { contactId } }, payload) => {

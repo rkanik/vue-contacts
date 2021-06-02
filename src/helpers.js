@@ -4,6 +4,38 @@ import { _time } from "./consts"
 
 /**
  * 
+ * Get the reference of a value from deep array or object
+ * 
+ * @param {Array | Object} input - Input object or array
+ * @param {String} path - Dotten path of which value to get 
+ */
+export const deepGet = (input, path) => {
+	let i
+	path = path.split('.');
+	for (i = 0; i < path.length; i++)
+		input = input[path[i]];
+	return input
+}
+
+/**
+ * 
+ * Set value of deep array or object
+ * 
+ * @param {Array | Object} input - Input object or array
+ * @param {String} path - Dotten path of where to set 
+ * @param {Any} value - Value to set in specified path
+ */
+export const deepSet = (input, path, value) => {
+	let i/*, originalInput = input; */
+	path = path.split('.');
+	for (i = 0; i < path.length - 1; i++)
+		input = input[path[i]];
+	input[path[i]] = value;
+	// return originalInput
+}
+
+/**
+ * 
  * @param {object} object 
  * @param {*} keys 
  * @returns {objecr}

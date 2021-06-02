@@ -1,14 +1,14 @@
-import { isObject } from "../helpers"
+import { deepGet, deepSet, isObject } from "../helpers"
 
 export const initialList = () => ({
 	total: 0,
-	perPage: 50,
-	currentPage: 1,
+	perPage: 25,
+	currentPage: 0,
 	data: []
 })
 
 const mutations = {
-	PUSH: (state, [array, item]) => (state[array].push(item)),
+	PUSH: (state, [path, item]) => (deepGet(state, path).push(item)),
 	UNSHIFT: (state, [array, item]) => (state[array].unshift(item)),
 	RESET: (state, initialState) => mutations.SET(state, initialState),
 	SET: (state, payload) => {
@@ -16,16 +16,16 @@ const mutations = {
 			([key, value]) => (state[key] = value)
 		)
 	},
-	DELETE: (state, [array, key, match = 'id']) => {
+	DELETE: (state, [path, key, match = 'id']) => {
 		let keys = Array.isArray(key) ? key : [key]
-		state[array] = state[array].filter(
+		deepSet(state, path, deepGet(state, path).filter(
 			el => !keys.includes(el[match])
-		)
+		))
 	},
-	UPDATE: (state, [array, data, match = 'id']) => {
-		state[array] = state[array].map(el => {
+	UPDATE: (state, [path, data, match = 'id']) => {
+		deepSet(state, path, deepGet(state, path).map(el => {
 			return el[match] === data[match] ? data : el
-		})
+		}))
 	},
 	MERGE: (state, [property, data, match = 'id']) => {
 		if (Array.isArray(state[property])) {

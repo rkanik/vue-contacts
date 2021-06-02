@@ -142,7 +142,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions } from 'vuex'
+import { only } from '../helpers'
 export default {
 	name: 'CreateUpdate',
 	data: () => ({
@@ -163,7 +164,10 @@ export default {
 
 			let res = await this.fetchContact(this.$route.params.id)
 			if (res.error) return this.$router.replace('/')
-			this.contact = { ...res.contact }
+			this.contact = only(res.contact, [
+				'firstName', 'lastName', 'company',
+				'jobTitle', 'note', 'phoneNumbers', 'emails'
+			])
 			this.update = true
 		}
 		else {

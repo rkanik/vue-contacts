@@ -5,7 +5,7 @@
 				<div
 					class="h-12 uppercase flex items-center text-sm text-seondary dark:text-dark-text-secondary tracking-widest"
 				>
-					Favorites (2)
+					Favorites ({{ $favoriteContacts.data.length }})
 				</div>
 
 				<button class="text-sm text-accent dark:text-dark-accent">
@@ -15,11 +15,15 @@
 
 			<div class="flex space-x-4">
 				<UAvatar
-					src="https://lh3.googleusercontent.com/-Nf5vWc06VhA/YGH5GUVuPqI/AAAAAAAAAAA/putuAMp5nb8qLBk74xxlov2TJSA4ATcugCOQCEAE/s89-p-k-rw-no/photo.jpg"
-					class="h-20 w-20 border-2 border-seondary dark:border-dark-seondary cursor-pointer"
-				/>
-				<UAvatar
-					src="https://lh3.googleusercontent.com/-dbprVm6xUBI/YGH5DJIYM2I/AAAAAAAAAAA/9oS3v3Hfoa4fIsnfPKJQhbg8vHMlbwK8wCOQCEAE/s89-p-k-rw-no/photo.jpg"
+					:key="contact.id"
+					:src="contact.avatar"
+					textClass="text-base"
+					@click="setContact(contact.id), (dialogs.contact = true)"
+					:text="
+						contact.firstName[0] +
+						(contact.lastName ? contact.lastName[0] : '')
+					"
+					v-for="contact in $favoriteContacts.data"
 					class="h-20 w-20 border-2 border-seondary dark:border-dark-seondary cursor-pointer"
 				/>
 			</div>
@@ -155,6 +159,10 @@
 				>
 					<u-button
 						icon
+						@click="onToggleFavorite(contact)"
+						:class="{
+							'bg-accent dark:bg-dark-accent': contact.isFavorite,
+						}"
 						class="transform transition-all duration-300 delay-100 scale-0 group-hover:scale-100"
 					>
 						<u-icon mdi="star" class="text-base"></u-icon>
@@ -190,7 +198,13 @@
 						{{ `${$contact.firstName} ${$contact.lastName}` }}
 					</h2>
 					<div class="flex items-center justify-end space-x-2">
-						<u-button icon>
+						<u-button
+							icon
+							@click="onToggleFavorite($contact)"
+							:class="{
+								'bg-accent dark:bg-dark-accent': $contact.isFavorite,
+							}"
+						>
 							<u-icon mdi="star" class="text-base"></u-icon>
 						</u-button>
 						<u-button icon @click="$router.push(`/${contact.id}`)">
@@ -265,11 +279,11 @@ import UDialog from '../components/utils/UDialog.vue'
 export default {
 	name: 'Home',
 	components: {
-		UDialog
+		UDialog,
+		UConfirm
 	},
 	data: () => ({
 		menu: false,
-		components: { UConfirm },
 		menus: {
 			checkAll: false
 		},
@@ -288,12 +302,18 @@ export default {
 		}
 	}),
 	async created() {
-		await this.fetchContacts()
+		await this.fetchFavoriteContacts()
+
+		const { perPage, currentPage } = this.$contacts
+		await this.fetchContacts({
+			perPage, currentPage: currentPage + 1,
+		})
 	},
 	computed: {
 		...mapGetters('me', [
 			'$contact',
-			'$contacts'
+			'$contacts',
+			'$favoriteContacts',
 		]),
 		checked() {
 			return this.contacts.reduce(
@@ -319,13 +339,20 @@ export default {
 	methods: {
 		...mapActions('me', [
 			'fetchContacts',
+			'fetchFavoriteContacts',
 			'fetchTrashedContacts',
 
 			'setContact',
 			'importContacts',
+			'toggleFavorite',
 
 			'moveContactsToTrash'
 		]),
+		async onToggleFavorite({ id, isFavorite }) {
+			await this.toggleFavorite({
+				id, isFavorite: !isFavorite
+			})
+		},
 		mapContacts(payload) {
 			this.contacts = this.contacts.map(
 				contact => ({ ...contact, ...payload })
